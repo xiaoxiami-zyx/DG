@@ -1,0 +1,8 @@
+param.x0   0.0
+param.x1   1.0
+param.y0   0.0
+param.y1   1.0
+param.nx   100
+param.ny   100
+param.k    2
+param.numGLP  5   
