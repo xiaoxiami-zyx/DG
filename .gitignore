@@ -2,3 +2,4 @@ __pycache__/fun.cpython-310.pyc
 *.o
 *.d
 .vscode
+*.vtk

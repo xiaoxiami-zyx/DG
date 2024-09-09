@@ -2,7 +2,7 @@
 # Compiler
 CXX = icpx
 # Compiler flags
-CXXFLAGS = -Wall -Wextra -O3 -fPIC -xHost -ftree-vectorize -mavx -msse2 -finline-functions
+CXXFLAGS = -Wall -Wextra -O3 -fPIC -xHost -ftree-vectorize -mavx -msse2 -std=c++23
 # Dependency flags
 DEPFLAGS = -MMD -MP
 
@@ -10,7 +10,8 @@ DEPFLAGS = -MMD -MP
 # OPENMP = -qopenmp
 
 # Source files
-SRCS = mesh.cpp main.cpp param.cpp field.cpp
+SRCS = mesh.cpp main.cpp param.cpp field.cpp gauss_Lobatto.cpp solver.cpp base_function.cpp \
+		output.cpp
 # Object files
 OBJS = $(SRCS:.cpp=.o)
 # Dependency files

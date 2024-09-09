@@ -5,14 +5,14 @@
 class Mesh
 {
     scalar       x0_, y0_, x1_, y1_;
-    label        nx_, ny_;
+    size_t        nx_, ny_;
     scalar       dx_, dy_;
 
     std::vector<scalar>  x_, y_;   // x and y coordinates of the nodes
     std::vector<scalar>  xc_, yc_; // x and y coordinates of the cell centers
 
 public:
-    Mesh (scalar x0, scalar y0, scalar x1, scalar y1, label nx, label ny);
+    Mesh (scalar x0, scalar y0, scalar x1, scalar y1, size_t nx, size_t ny);
 
     ~Mesh(){};
         
@@ -24,9 +24,9 @@ public:
 
     scalar y1() const { return y1_; }
 
-    label nx() const { return nx_; }
+    size_t nx() const { return nx_; }
 
-    label ny() const { return ny_; }
+    size_t ny() const { return ny_; }
 
     scalar dx() const { return dx_; }
 

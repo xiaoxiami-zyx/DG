@@ -10,6 +10,7 @@ using label  = int;
 #include <cassert>
 #include <set>
 #include <fstream>
+#include <boost/multi_array.hpp>
 
 #include "Vector.hpp"
 
@@ -17,15 +18,23 @@ using label  = int;
 using svector = Vector<scalar>;
 using Point = svector;
 
+using array_4 = boost::multi_array<scalar, 4>;
+using array_3 = boost::multi_array<scalar, 3>;
+using array_2 = boost::multi_array<scalar, 2>;
+
+#ifndef _SIZE_T
+typedef __SIZE_TYPE__ size_t;
+#endif
+
 
 struct Parameter
 {
     scalar x0, y0, x1, y1;  // Domain
-    label nx, ny;           // Number of cells
+    size_t nx, ny;           // Number of cells
 
-    label k;                // Order of the scheme
-    label dimPk;            // Dimension of the coefficient field
-    label numGLP;           // Number of Gauss-Lobatto points
+    size_t k;                // Order of the scheme
+    size_t dimPk;            // Dimension of the coefficient field
+    size_t numGLP;           // Number of Gauss-Lobatto points
 
 };
 
