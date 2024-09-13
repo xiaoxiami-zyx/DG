@@ -11,7 +11,7 @@ DEPFLAGS = -MMD -MP
 
 # Source files
 SRCS = mesh.cpp main.cpp param.cpp field.cpp gauss_Lobatto.cpp solver.cpp base_function.cpp \
-		output.cpp
+		output.cpp phi2coff.cpp
 # Object files
 OBJS = $(SRCS:.cpp=.o)
 # Dependency files
@@ -19,12 +19,13 @@ DEPS = $(SRCS:.cpp=.d)
 
 # 3rd
 # gmsh_DIR = /home/xxm/gmsh
-# eigen_Dir = /home/xxm/eigen
+eigen_Dir = /home/xxm/eigen
 # amgcl_Dir = /home/xxm/amgcl
 
 # Include paths
 # LIB = -L$(gmsh_DIR)/lib
 # INCLUDE = -I$(gmsh_DIR)/include -I$(eigen_Dir)/Eigen -I$(amgcl_Dir)
+INCLUDE = -I$(eigen_Dir)
 
 # LINK = -lgmsh
 

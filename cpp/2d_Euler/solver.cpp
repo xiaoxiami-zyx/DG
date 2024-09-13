@@ -7,6 +7,7 @@ Solver::Solver(Mesh& mesh, Parameter& param)
     fieldCreator_ = new FieldCreator(mesh_, param_);
     gl_ = new Gauss_Lobatto(param_.numGLP);
     baseFunction_ = new BaseFunction(param_.dimPk, param_.numGLP, *gl_, mesh_.dx(), mesh_.dy());
+    phi2coff = new Phi2Coff(gl_->weight(), baseFunction_->phiGauss(), baseFunction_->mm());
 
     output_ = new Output(mesh_);
 }
@@ -21,11 +22,9 @@ Solver::~Solver()
 
 void Solver::init()
 {
-    // create fields
-    createFields();
-
-    // set initial condition
-    setInitialCondition();
+    createFields();        // 创建场
+    setInitialCondition(); // 设置初场
+    computeL2forInitial(); // 计算初场L2投影，得到基函数系数初值
 }
 
 void Solver::createFields()
@@ -51,7 +50,7 @@ void Solver::createFields()
 void Solver::setInitialCondition()
 {
 
-    size_t nx = mesh_.nx();  size_t ny = mesh_.ny();
+    label nx = mesh_.nx();  label ny = mesh_.ny();
     scalar dx = mesh_.dx();  scalar dy = mesh_.dy();
     scalar dx1 = dx * 0.5;   scalar dy1 = dy * 0.5;
 
@@ -60,29 +59,47 @@ void Solver::setInitialCondition()
 
     const std::vector<scalar>& lambda = gl_->lambda();
 
-    array_3& rho = fields_.at("rho").phi();
-    array_3& u = fields_.at("u").phi();
-    array_3& v = fields_.at("v").phi();
-    array_3& p = fields_.at("p").phi();
+    array_4& rho = fields_.at("rho").phi();
+    array_4& u = fields_.at("u").phi();
+    array_4& v = fields_.at("v").phi();
+    array_4& p = fields_.at("p").phi();
 
-    size_t numGLP = param_.numGLP;
+    label numGLP = param_.numGLP;
 
     scalar x, y; // coord
 
-    for(size_t i = 0; i < nx; i++)
-    for(size_t j = 0; j < ny; j++)
-    for(size_t k = 0; k < numGLP; k++)
+    for(label i = 0; i < nx; i++)
+    for(label j = 0; j < ny; j++)
+    for(label i1 = 0; i1 < numGLP; i1++)
+    for(label j1 = 0; j1 < numGLP; j1++)
     {
-        x = xc[i] + lambda[k] * dx1;
-        y = yc[j] + lambda[k] * dy1;
+        x = xc[i] + lambda[i1] * dx1;
+        y = yc[j] + lambda[j1] * dy1;
 
-        rho[i][j][k] = rho0(x, y);
-        u[i][j][k] = u0(x, y);
-        v[i][j][k] = v0(x, y);
-        p[i][j][k] = p0(x, y);
+        rho(i,j,i1,j1) = rho0(x, y);
+        u(i,j,i1,j1) = u0(x, y);
+        v(i,j,i1,j1) = v0(x, y);
+        p(i,j,i1,j1) = p0(x, y);
     } 
  
-    output_->writeVtk("p", p);
+    array_4& rhou = fields_.at("rhou").phi();
+    array_4& rhov = fields_.at("rhov").phi();
+    array_4& E = fields_.at("E").phi();
+
+    rhou = rho * u;
+    rhov = rho * v;
+    E = p / (param_.gamma - 1) + 0.5 * rho * (u * u + v * v);
 
 
+}
+
+void Solver::computeL2forInitial()
+{
+    for(auto& field : fields_)
+    {
+        phi2coff->computeCoff(field.second);
+    }
+
+    array_3& p = fields_.at("E").data();
+    output_->writeVtk("E", p);
 }

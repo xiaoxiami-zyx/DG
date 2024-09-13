@@ -12,7 +12,8 @@ public:
 
     ~Output(){};
 
+    void writeVtk(const std::string& filename, const array_4& data);
     void writeVtk(const std::string& filename, const array_3& data);
-
+    void writeVtk(const std::string& filename, const array_2& data);
 
 };

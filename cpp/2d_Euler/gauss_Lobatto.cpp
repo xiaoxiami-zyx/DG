@@ -1,6 +1,6 @@
 #include "gauss_Lobatto.hpp"
 
-Gauss_Lobatto::Gauss_Lobatto(size_t numGLP)
+Gauss_Lobatto::Gauss_Lobatto(label numGLP)
 :numGLP_(numGLP)
 {
     lambda_.resize(numGLP_);

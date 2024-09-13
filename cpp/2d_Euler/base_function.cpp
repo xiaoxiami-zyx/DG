@@ -1,7 +1,15 @@
 #include "base_function.hpp"
 
-BaseFunction::BaseFunction(size_t dimPk, size_t numGLP, Gauss_Lobatto& glp, scalar dx, scalar dy)
-: dimPk_(dimPk), numGLP_(numGLP)
+BaseFunction::BaseFunction(label dimPk, label numGLP, Gauss_Lobatto& glp, scalar dx, scalar dy)
+: dimPk_(dimPk), numGLP_(numGLP),
+phiGauss_(numGLP_, numGLP_, dimPk_), 
+phiGaussLL_(numGLP_, numGLP_, dimPk_, 3),
+phiGaussR_(numGLP_, dimPk_), 
+phiGaussU_(numGLP_, dimPk_), 
+phiGaussD_(numGLP_, dimPk_), 
+phiGaussL_(numGLP_, dimPk_),
+phiGauss_dx_(numGLP_, numGLP_, dimPk_),
+phiGauss_dy_(numGLP_, numGLP_, dimPk_)
 {
     phiLD_.resize(dimPk_);
     phiLU_.resize(dimPk_);
@@ -42,96 +50,79 @@ BaseFunction::BaseFunction(size_t dimPk, size_t numGLP, Gauss_Lobatto& glp, scal
     const std::vector<scalar>& lambda = glp.lambda();
     const std::vector<scalar>& lambdaL = glp.lambdaL();
 
-    phiGauss.resize(boost::extents[numGLP_][numGLP_][dimPk_]);
-    phiGauss_dx.resize(boost::extents[numGLP_][numGLP_][dimPk_]);
-    phiGauss_dy.resize(boost::extents[numGLP_][numGLP_][dimPk_]);
-
-    phiGaussLL.resize(boost::extents[numGLP_][numGLP_][dimPk_][3]);
-    
-    phiGaussR.resize(boost::extents[numGLP_][dimPk_]);
-    phiGaussU.resize(boost::extents[numGLP_][dimPk_]);
-    phiGaussD.resize(boost::extents[numGLP_][dimPk_]);
-    phiGaussL.resize(boost::extents[numGLP_][dimPk_]);
-
-    for(size_t i = 0; i < numGLP_; i++)
-    for(size_t j = 0; j < numGLP_; j++)
+    for(label i = 0; i < numGLP_; i++)
+    for(label j = 0; j < numGLP_; j++)
     {
-        phiGauss[i][j][0] = basefunc_0(lambda[i], lambda[j]);
-        phiGauss[i][j][1] = basefunc_1(lambda[i], lambda[j]);
-        phiGauss[i][j][2] = basefunc_2(lambda[i], lambda[j]);
-        phiGauss[i][j][3] = basefunc_3(lambda[i], lambda[j]);
-        phiGauss[i][j][4] = basefunc_4(lambda[i], lambda[j]);
-        phiGauss[i][j][5] = basefunc_5(lambda[i], lambda[j]);
+        phiGauss_(i,j,0) = basefunc_0(lambda[i], lambda[j]);
+        phiGauss_(i,j,1) = basefunc_1(lambda[i], lambda[j]);
+        phiGauss_(i,j,2) = basefunc_2(lambda[i], lambda[j]);
+        phiGauss_(i,j,3) = basefunc_3(lambda[i], lambda[j]);
+        phiGauss_(i,j,4) = basefunc_4(lambda[i], lambda[j]);
+        phiGauss_(i,j,5) = basefunc_5(lambda[i], lambda[j]);
 
-        phiGaussLL[i][j][0][0] = basefunc_0(lambdaL[i], lambda[j]);
-        phiGaussLL[i][j][0][1] = basefunc_0(lambda[i], lambdaL[j]);
-        phiGaussLL[i][j][0][2] = basefunc_0(lambda[i], lambda[j]);
-
-        phiGaussLL[i][j][1][0] = basefunc_1(lambdaL[i], lambda[j]);
-        phiGaussLL[i][j][1][1] = basefunc_1(lambda[i], lambdaL[j]);
-        phiGaussLL[i][j][1][2] = basefunc_1(lambda[i], lambda[j]);
-
-        phiGaussLL[i][j][2][0] = basefunc_2(lambdaL[i], lambda[j]);
-        phiGaussLL[i][j][2][1] = basefunc_2(lambda[i], lambdaL[j]);
-        phiGaussLL[i][j][2][2] = basefunc_2(lambda[i], lambda[j]);
-
-        phiGaussLL[i][j][3][0] = basefunc_3(lambdaL[i], lambda[j]);
-        phiGaussLL[i][j][3][1] = basefunc_3(lambda[i], lambdaL[j]);
-        phiGaussLL[i][j][3][2] = basefunc_3(lambda[i], lambda[j]);
-
-        phiGaussLL[i][j][4][0] = basefunc_4(lambdaL[i], lambda[j]);
-        phiGaussLL[i][j][4][1] = basefunc_4(lambda[i], lambdaL[j]);
-        phiGaussLL[i][j][4][2] = basefunc_4(lambda[i], lambda[j]);
-
-        phiGaussLL[i][j][5][0] = basefunc_5(lambdaL[i], lambda[j]);
-        phiGaussLL[i][j][5][1] = basefunc_5(lambda[i], lambdaL[j]);
-        phiGaussLL[i][j][5][2] = basefunc_5(lambda[i], lambda[j]);
+        phiGaussLL_(i,j,0,0) = basefunc_0(lambdaL[i], lambda[j]);
+        phiGaussLL_(i,j,0,1) = basefunc_0(lambda[i], lambdaL[j]);
+        phiGaussLL_(i,j,0,2) = basefunc_0(lambda[i], lambda[j]);
+        phiGaussLL_(i,j,1,0) = basefunc_1(lambdaL[i], lambda[j]);
+        phiGaussLL_(i,j,1,1) = basefunc_1(lambda[i], lambdaL[j]);
+        phiGaussLL_(i,j,1,2) = basefunc_1(lambda[i], lambda[j]);
+        phiGaussLL_(i,j,2,0) = basefunc_2(lambdaL[i], lambda[j]);
+        phiGaussLL_(i,j,2,1) = basefunc_2(lambda[i], lambdaL[j]);
+        phiGaussLL_(i,j,2,2) = basefunc_2(lambda[i], lambda[j]);
+        phiGaussLL_(i,j,3,0) = basefunc_3(lambdaL[i], lambda[j]);
+        phiGaussLL_(i,j,3,1) = basefunc_3(lambda[i], lambdaL[j]);
+        phiGaussLL_(i,j,3,2) = basefunc_3(lambda[i], lambda[j]);
+        phiGaussLL_(i,j,4,0) = basefunc_4(lambdaL[i], lambda[j]);
+        phiGaussLL_(i,j,4,1) = basefunc_4(lambda[i], lambdaL[j]);
+        phiGaussLL_(i,j,4,2) = basefunc_4(lambda[i], lambda[j]);
+        phiGaussLL_(i,j,5,0) = basefunc_5(lambdaL[i], lambda[j]);
+        phiGaussLL_(i,j,5,1) = basefunc_5(lambda[i], lambdaL[j]);
+        phiGaussLL_(i,j,5,2) = basefunc_5(lambda[i], lambda[j]);
 
 
-        phiGauss_dx[i][j][0] = basefunc_dx_0(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dx[i][j][1] = basefunc_dx_1(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dx[i][j][2] = basefunc_dx_2(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dx[i][j][3] = basefunc_dx_3(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dx[i][j][4] = basefunc_dx_4(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dx[i][j][5] = basefunc_dx_5(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-
-        phiGauss_dy[i][j][0] = basefunc_dy_0(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dy[i][j][1] = basefunc_dy_1(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dy[i][j][2] = basefunc_dy_2(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dy[i][j][3] = basefunc_dy_3(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dy[i][j][4] = basefunc_dy_4(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
-        phiGauss_dy[i][j][5] = basefunc_dy_5(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dx_(i,j,0) = basefunc_dx_0(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dx_(i,j,1) = basefunc_dx_1(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dx_(i,j,2) = basefunc_dx_2(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dx_(i,j,3) = basefunc_dx_3(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dx_(i,j,4) = basefunc_dx_4(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dx_(i,j,5) = basefunc_dx_5(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dy_(i,j,0) = basefunc_dy_0(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dy_(i,j,1) = basefunc_dy_1(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dy_(i,j,2) = basefunc_dy_2(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dy_(i,j,3) = basefunc_dy_3(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dy_(i,j,4) = basefunc_dy_4(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
+        phiGauss_dy_(i,j,5) = basefunc_dy_5(lambda[i], lambda[j], dx / 2.0, dy / 2.0);
     }
 
-    for(size_t i = 0; i < numGLP_; i++)
+    for(label i = 0; i < numGLP_; i++)
     {
-        phiGaussR[i][0] = basefunc_0(1.0, lambda[i]);
-        phiGaussR[i][1] = basefunc_1(1.0, lambda[i]);
-        phiGaussR[i][2] = basefunc_2(1.0, lambda[i]);
-        phiGaussR[i][3] = basefunc_3(1.0, lambda[i]);
-        phiGaussR[i][4] = basefunc_4(1.0, lambda[i]);
-        phiGaussR[i][5] = basefunc_5(1.0, lambda[i]);
+        phiGaussR_(i,0) = basefunc_0(1.0, lambda[i]);
+        phiGaussR_(i,1) = basefunc_1(1.0, lambda[i]);
+        phiGaussR_(i,2) = basefunc_2(1.0, lambda[i]);
+        phiGaussR_(i,3) = basefunc_3(1.0, lambda[i]);
+        phiGaussR_(i,4) = basefunc_4(1.0, lambda[i]);
+        phiGaussR_(i,5) = basefunc_5(1.0, lambda[i]);
 
-        phiGaussU[i][0] = basefunc_0(lambda[i], 1.0);
-        phiGaussU[i][1] = basefunc_1(lambda[i], 1.0);
-        phiGaussU[i][2] = basefunc_2(lambda[i], 1.0);
-        phiGaussU[i][3] = basefunc_3(lambda[i], 1.0);
-        phiGaussU[i][4] = basefunc_4(lambda[i], 1.0);
-        phiGaussU[i][5] = basefunc_5(lambda[i], 1.0);
+        phiGaussU_(i,0) = basefunc_0(lambda[i], 1.0);
+        phiGaussU_(i,1) = basefunc_1(lambda[i], 1.0);
+        phiGaussU_(i,2) = basefunc_2(lambda[i], 1.0);
+        phiGaussU_(i,3) = basefunc_3(lambda[i], 1.0);
+        phiGaussU_(i,4) = basefunc_4(lambda[i], 1.0);
+        phiGaussU_(i,5) = basefunc_5(lambda[i], 1.0);
 
-        phiGaussD[i][0] = basefunc_0(lambda[i], -1.0);
-        phiGaussD[i][1] = basefunc_1(lambda[i], -1.0);
-        phiGaussD[i][2] = basefunc_2(lambda[i], -1.0);
-        phiGaussD[i][3] = basefunc_3(lambda[i], -1.0);
-        phiGaussD[i][4] = basefunc_4(lambda[i], -1.0);
-        phiGaussD[i][5] = basefunc_5(lambda[i], -1.0);
+        phiGaussD_(i,0) = basefunc_0(lambda[i], -1.0);
+        phiGaussD_(i,1) = basefunc_1(lambda[i], -1.0);
+        phiGaussD_(i,2) = basefunc_2(lambda[i], -1.0);
+        phiGaussD_(i,3) = basefunc_3(lambda[i], -1.0);
+        phiGaussD_(i,4) = basefunc_4(lambda[i], -1.0);
+        phiGaussD_(i,5) = basefunc_5(lambda[i], -1.0);
 
-        phiGaussL[i][0] = basefunc_0(-1.0, lambda[i]);
-        phiGaussL[i][1] = basefunc_1(-1.0, lambda[i]);
-        phiGaussL[i][2] = basefunc_2(-1.0, lambda[i]);
-        phiGaussL[i][3] = basefunc_3(-1.0, lambda[i]);
-        phiGaussL[i][4] = basefunc_4(-1.0, lambda[i]);
-        phiGaussL[i][5] = basefunc_5(-1.0, lambda[i]);
+        phiGaussL_(i,0) = basefunc_0(-1.0, lambda[i]);
+        phiGaussL_(i,1) = basefunc_1(-1.0, lambda[i]);
+        phiGaussL_(i,2) = basefunc_2(-1.0, lambda[i]);
+        phiGaussL_(i,3) = basefunc_3(-1.0, lambda[i]);
+        phiGaussL_(i,4) = basefunc_4(-1.0, lambda[i]);
+        phiGaussL_(i,5) = basefunc_5(-1.0, lambda[i]);
     }
 
 }

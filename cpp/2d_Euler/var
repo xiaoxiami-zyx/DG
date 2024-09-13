@@ -6,3 +6,4 @@ param.nx   100
 param.ny   100
 param.k    2
 param.numGLP  5   
+param.gamma  1.4

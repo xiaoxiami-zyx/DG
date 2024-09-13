@@ -3,6 +3,7 @@
 #include "mesh.hpp"
 #include "field.hpp"
 #include "base_function.hpp"
+#include "phi2coff.hpp"
 #include "output.hpp"
 
 class Solver
@@ -13,6 +14,7 @@ class Solver
     FieldCreator*    fieldCreator_ = nullptr;  // field creator
     BaseFunction*    baseFunction_ = nullptr;  // base function
     Gauss_Lobatto*   gl_ = nullptr;    // Gauss-Lobatto points
+    Phi2Coff*        phi2coff = nullptr;
 
     Output*          output_ = nullptr;  // output
 
@@ -29,5 +31,7 @@ public:
     void createFields();
 
     void setInitialCondition();
+
+    void computeL2forInitial();
 
 };

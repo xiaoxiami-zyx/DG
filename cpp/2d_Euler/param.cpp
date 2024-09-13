@@ -20,6 +20,7 @@ void readPara(std::string paraDir, Parameter& param)
     inputPara >> invStr >> param.k;
     param.dimPk = (param.k + 1)*(param.k + 2)/2;
     inputPara >> invStr >> param.numGLP;
+    inputPara >> invStr >> param.gamma;
 
     inputPara.close(); 
 }

@@ -10,8 +10,8 @@
  */
 class BaseFunction
 {
-    size_t     dimPk_;  // 多项式阶数
-    size_t     numGLP_; // Gauss-Lobatto 积分点数
+    label     dimPk_;  // 多项式阶数
+    label     numGLP_; // Gauss-Lobatto 积分点数
 
     std::vector<scalar> phiRU_;   // 基函数在点(1,1)的值
     std::vector<scalar> phiLU_;   // 基函数在点(-1,1)的值
@@ -20,20 +20,23 @@ class BaseFunction
     
     std::vector<scalar> mm_;  // mass matrix
 
-    array_3     phiGauss;     // [numGLP, numGLP, dimPk]  基函数在Gauss积分点的值
-    array_4     phiGaussLL;   // [numGLP, numGLP, dimPk, 3]
-    array_2     phiGaussR;    // [numGLP, dimPk]  right
-    array_2     phiGaussU;    // [numGLP, dimPk]  up
-    array_2     phiGaussD;    // [numGLP, dimPk]  down
-    array_2     phiGaussL;    // [numGLP, dimPk]  left
-    array_3     phiGauss_dx;  // [numGLP, numGLP, dimPk] 基函数在Gauss积分点的导数
-    array_3     phiGauss_dy;  // [numGLP, numGLP, dimPk] 基函数在Gauss积分点的导数
+    array_3     phiGauss_;     // [numGLP, numGLP, dimPk]  基函数在Gauss积分点的值
+    array_4     phiGaussLL_;   // [numGLP, numGLP, dimPk, 3]
+    array_2     phiGaussR_;    // [numGLP, dimPk]  right
+    array_2     phiGaussU_;    // [numGLP, dimPk]  up
+    array_2     phiGaussD_;    // [numGLP, dimPk]  down
+    array_2     phiGaussL_;    // [numGLP, dimPk]  left
+    array_3     phiGauss_dx_;  // [numGLP, numGLP, dimPk] 基函数在Gauss积分点的导数
+    array_3     phiGauss_dy_;  // [numGLP, numGLP, dimPk] 基函数在Gauss积分点的导数
 
 public:
-    BaseFunction(size_t dimPk, size_t numGLP, Gauss_Lobatto& glp, scalar dx, scalar dy);
+    BaseFunction(label dimPk, label numGLP, Gauss_Lobatto& glp, scalar dx, scalar dy);
 
     ~BaseFunction(){};
 
+    const array_3& phiGauss() const {return phiGauss_;};
+
+    const std::vector<scalar>& mm () const {return mm_;};
 
 
     // 定义基函数

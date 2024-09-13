@@ -9,17 +9,17 @@
  */
 class Gauss_Lobatto
 {
-    size_t numGLP_;        // Number of Gauss-Lobatto points
+    label numGLP_;        // Number of Gauss-Lobatto points
     std::vector<scalar> lambda_;   // 
     std::vector<scalar> weight_;   // Gauss-Lobatto weights
     std::vector<scalar> lambdaL_;  // Gauss-Lobatto points
 
 public:
-    Gauss_Lobatto(size_t numGLP);
+    Gauss_Lobatto(label numGLP);
 
     ~Gauss_Lobatto(){};
 
-    size_t numGLP() const { return numGLP_; }
+    label numGLP() const { return numGLP_; }
 
     const std::vector<scalar>& lambda() const { return lambda_; }
 

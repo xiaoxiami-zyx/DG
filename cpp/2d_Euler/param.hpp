@@ -10,7 +10,8 @@ using label  = int;
 #include <cassert>
 #include <set>
 #include <fstream>
-#include <boost/multi_array.hpp>
+// #include <boost/multi_array.hpp>
+#include <unsupported/Eigen/CXX11/Tensor>
 
 #include "Vector.hpp"
 
@@ -18,23 +19,29 @@ using label  = int;
 using svector = Vector<scalar>;
 using Point = svector;
 
-using array_4 = boost::multi_array<scalar, 4>;
-using array_3 = boost::multi_array<scalar, 3>;
-using array_2 = boost::multi_array<scalar, 2>;
+// using array_4 = boost::multi_array<scalar, 4>;
+// using array_3 = boost::multi_array<scalar, 3>;
+// using array_2 = boost::multi_array<scalar, 2>;
+
+using array_4 = Eigen::Tensor<scalar, 4>;
+using array_3 = Eigen::Tensor<scalar, 3>;
+using array_2 = Eigen::Tensor<scalar, 2>;
 
 #ifndef _SIZE_T
-typedef __SIZE_TYPE__ size_t;
+typedef __SIZE_TYPE__ label;
 #endif
 
 
 struct Parameter
 {
     scalar x0, y0, x1, y1;  // Domain
-    size_t nx, ny;           // Number of cells
+    label nx, ny;           // Number of cells
 
-    size_t k;                // Order of the scheme
-    size_t dimPk;            // Dimension of the coefficient field
-    size_t numGLP;           // Number of Gauss-Lobatto points
+    label k;                // Order of the scheme
+    label dimPk;            // Dimension of the coefficient field
+    label numGLP;           // Number of Gauss-Lobatto points
+
+    scalar gamma;           // Heat capacity ratio
 
 };
 

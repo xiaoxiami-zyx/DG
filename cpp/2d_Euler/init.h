@@ -30,6 +30,8 @@ scalar rho0(scalar x, scalar y)
         return 0.138;
     else if (r == 4)
         return 0.5323;
+
+    return 0.0;
 }
 
 scalar u0(scalar x, scalar y)
@@ -43,6 +45,7 @@ scalar u0(scalar x, scalar y)
         return 1.206;
     else if (r == 4)
         return 0.0;
+    return 0.0;
 }
 
 scalar v0(scalar x, scalar y)
@@ -56,6 +59,7 @@ scalar v0(scalar x, scalar y)
         return 1.206;
     else if (r == 4)
         return 1.206;
+    return 0.0;
 }
 
 scalar p0(scalar x, scalar y)
@@ -69,6 +73,7 @@ scalar p0(scalar x, scalar y)
         return 0.029;
     else if (r == 4)
         return 0.3;
+    return 0.0;
 }
 
 
